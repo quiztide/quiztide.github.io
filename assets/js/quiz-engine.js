@@ -88,25 +88,6 @@
         quizData = data;
         if (quizLangNotice) quizLangNotice.style.display = 'none';
         return data;
-      })
-      .catch(function() {
-        var fallbackLang = (window.i18next && i18next.options && i18next.options.fallbackLng && i18next.options.fallbackLng[0]) || 'pt';
-        var fallbackUrl = baseUrl + 'locales/' + fallbackLang + '.json';
-
-        return fetch(fallbackUrl)
-          .then(function(res) {
-            if (!res.ok) throw new Error('Fallback failed');
-            return res.json();
-          })
-          .then(function(fallbackData) {
-            currentLang = fallbackLang;
-            quizData = fallbackData;
-            if (quizLangNotice) {
-              quizLangNotice.textContent = (window.i18next && i18next.t('lang_not_available')) || '';
-              quizLangNotice.style.display = 'block';
-            }
-            return fallbackData;
-          });
       });
   }
 
@@ -347,7 +328,7 @@
 
       var qTitle = quizData.title || '';
       var rTitle = winner.title || '';
-      var tmpl = (window.i18next && i18next.t('share_msg')) || 'Quiztide: {title} - {result}';
+      var tmpl = i18next.t('share_msg');
       var shareText = tmpl.replace('{title}', qTitle).replace('{result}', rTitle) + ' ' + window.location.href;
 
       var url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(shareText);

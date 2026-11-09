@@ -29,11 +29,15 @@
   <script>
     window.LANGUAGES = {{ site.data.languages | jsonify }};
     window.CURRENT_LANG = localStorage.getItem('quiztide_lang') || 'pt';
+    window.isI18nReady = false;
 
     window.initI18n = function(callback) {
+      if (!window.i18next || !window.locI18next) {
+        setTimeout(function() { window.initI18n(callback); }, 20);
+        return;
+      }
       i18next.init({
         lng: window.CURRENT_LANG,
-        fallbackLng: 'pt',
         resources: {
           pt: { translation: {{ site.data.i18n.pt | jsonify }} },
           en: { translation: {{ site.data.i18n.en | jsonify }} },
@@ -43,6 +47,8 @@
         window.localize = locI18next.init(i18next);
         window.localize('body');
         window.updateLangDropdown(i18next.language);
+        window.isI18nReady = true;
+        window.dispatchEvent(new CustomEvent('quiztide:i18nready', { detail: { lang: i18next.language } }));
         if (typeof callback === 'function') callback();
       });
     };
@@ -60,7 +66,7 @@
     };
 
     window.updateLangDropdown = function(lang) {
-      var l = (window.LANGUAGES && window.LANGUAGES[lang]) || (window.LANGUAGES && window.LANGUAGES.pt);
+      var l = window.LANGUAGES && window.LANGUAGES[lang];
       if (!l) return;
       var flagImg = document.getElementById('current-flag-img');
       var langName = document.getElementById('current-lang-name');

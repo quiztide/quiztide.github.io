@@ -168,7 +168,7 @@ input:focus:not(:focus-visible) {
   font-size: 13.5px;
   font-weight: 500;
   color: var(--text-secondary);
-  transition: color 120ms ease;
+  transition: color 150ms ease;
 }
 
 .nav-item:hover {
@@ -203,7 +203,7 @@ summary.lang-dropdown-trigger::-webkit-details-marker {
   font-weight: 500;
   color: var(--text-primary);
   box-shadow: var(--shadow-sm);
-  transition: all 120ms ease;
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
   user-select: none;
 }
 
@@ -231,7 +231,7 @@ summary.lang-dropdown-trigger::-webkit-details-marker {
 
 .dropdown-chevron {
   color: var(--text-muted);
-  transition: transform 150ms ease;
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .lang-dropdown.is-open .dropdown-chevron,
@@ -253,12 +253,6 @@ details.lang-dropdown[open] .dropdown-chevron {
   flex-direction: column;
   gap: 2px;
   z-index: 100;
-  animation: menuFadeIn 120ms ease-out;
-}
-
-@keyframes menuFadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .lang-dropdown.is-open .lang-dropdown-menu,
@@ -281,7 +275,7 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   color: var(--text-secondary);
   cursor: pointer;
   text-align: left;
-  transition: all 100ms ease;
+  transition: background-color 150ms ease, color 150ms ease;
 }
 
 .lang-option-item:hover {
@@ -461,16 +455,12 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   border-radius: var(--radius-full);
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-  transition: all 120ms ease;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
 .chip-btn:hover {
   border-color: var(--border-hover);
   color: var(--text-primary);
-}
-
-.chip-btn:active {
-  transform: scale(0.98);
 }
 
 .chip-btn.active {
@@ -525,19 +515,14 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-card);
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
   display: flex;
   flex-direction: column;
 }
 
 .quiz-card:hover {
-  transform: translateY(-3px);
+  border-color: var(--border-hover);
   box-shadow: var(--shadow-card-hover);
-  border-color: #cbd5e1;
-}
-
-.quiz-card:active {
-  transform: scale(0.995);
 }
 
 .quiz-card-link {
@@ -636,12 +621,7 @@ details.lang-dropdown[open] .lang-dropdown-menu {
 }
 
 .card-cta-arrow {
-  transition: transform 150ms ease;
   color: var(--text-primary);
-}
-
-.quiz-card:hover .card-cta-arrow {
-  transform: translateX(4px);
 }
 
 /* ==========================================================================
@@ -673,7 +653,7 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   color: var(--text-secondary);
   text-decoration: none;
   box-shadow: var(--shadow-sm);
-  transition: all 120ms ease;
+  transition: color 150ms ease, border-color 150ms ease;
 }
 
 .quiz-back-button:hover {
@@ -844,17 +824,13 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   color: var(--text-primary);
   cursor: pointer;
   text-align: left;
-  transition: all 120ms ease;
+  transition: background-color 150ms ease, border-color 150ms ease;
   box-shadow: var(--shadow-sm);
 }
 
 .quiz-option-button:hover:not(.disabled) {
   background: #f8fafc;
-  border-color: #cbd5e1;
-}
-
-.quiz-option-button:active:not(.disabled) {
-  transform: scale(0.99);
+  border-color: var(--border-hover);
 }
 
 .quiz-option-button.selected {
@@ -1051,12 +1027,8 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   border-radius: var(--radius-md);
   text-decoration: none;
   cursor: pointer;
-  transition: all 120ms ease;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
   border: 1px solid transparent;
-}
-
-.btn:active {
-  transform: scale(0.98);
 }
 
 .btn-whatsapp {

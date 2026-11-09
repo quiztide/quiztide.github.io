@@ -63,7 +63,7 @@ title: "Avaliações"
     var activeTag = 'all';
 
     function getLang() {
-      return (window.i18next && i18next.language) || window.CURRENT_LANG || 'pt';
+      return (window.i18next && i18next.language) || window.CURRENT_LANG;
     }
 
     function renderTagFilterBar() {
@@ -72,7 +72,7 @@ title: "Avaliações"
       var tagSet = {};
 
       quizzes.forEach(function(q) {
-        var loc = q[lang] || q.pt || {};
+        var loc = q[lang] || {};
         (loc.tags || []).forEach(function(t) {
           tagSet[t] = true;
         });
@@ -85,7 +85,7 @@ title: "Avaliações"
       allBtn.type = 'button';
       allBtn.className = 'chip-btn' + (activeTag === 'all' ? ' active' : '');
       allBtn.setAttribute('data-i18n', 'all_tags');
-      allBtn.textContent = (window.i18next && i18next.t('all_tags')) || '';
+      allBtn.textContent = i18next.t('all_tags');
       allBtn.addEventListener('click', function() {
         document.querySelectorAll('.chip-btn').forEach(function(b) { b.classList.remove('active'); });
         allBtn.classList.add('active');
@@ -118,7 +118,7 @@ title: "Avaliações"
       catalogCollection.innerHTML = '';
 
       quizzes.forEach(function(q) {
-        var loc = q[lang] || q.pt || {};
+        var loc = q[lang] || {};
         var title = loc.title || '';
         var subtitle = loc.subtitle || '';
         var category = loc.category || '';
@@ -139,8 +139,8 @@ title: "Avaliações"
           var card = document.createElement('article');
           card.className = 'quiz-card';
 
-          var qLabel = (window.i18next && i18next.t('questions_label')) || '';
-          var startLabel = (window.i18next && i18next.t('start_quiz')) || '';
+          var qLabel = i18next.t('questions_label');
+          var startLabel = i18next.t('start_quiz');
 
           card.innerHTML =
             '<a href="' + (q.url || '#') + '" class="quiz-card-link">' +
@@ -168,7 +168,7 @@ title: "Avaliações"
       });
 
       if (catalogCountLabel) {
-        var countUnit = (window.i18next && i18next.t('assessments_available')) || '';
+        var countUnit = i18next.t('assessments_available');
         catalogCountLabel.textContent = visibleCount + ' ' + countUnit;
       }
 
@@ -200,16 +200,16 @@ title: "Avaliações"
       }
     });
 
-    window.addEventListener('quiztide:langchange', function() {
+    function update() {
       renderTagFilterBar();
       renderCards();
-    });
+    }
 
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(function() {
-        renderTagFilterBar();
-        renderCards();
-      }, 50);
-    });
+    window.addEventListener('quiztide:i18nready', update);
+    window.addEventListener('quiztide:langchange', update);
+
+    if (window.isI18nReady) {
+      update();
+    }
   })();
 </script>
