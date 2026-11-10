@@ -31,14 +31,56 @@ title: "Avaliações"
   </div>
 </section>
 
-<!-- Cards Catalog Grid -->
+<!-- Cards Catalog Grid (Rendered Statically at Build Time) -->
 <section class="catalog-section">
   <div class="catalog-container">
     <div class="catalog-meta">
       <span class="catalog-counter" id="catalog-count-label"></span>
     </div>
 
-    <div class="quiz-grid" id="quiz-catalog-collection"></div>
+    <div class="quiz-grid" id="quiz-catalog-collection">
+      {% for quiz in site.data.quizzes %}
+        <article class="quiz-card"
+                 data-quiz-id="{{ quiz.id }}"
+                 data-tags-pt="{{ quiz.pt.tags | join: ',' | downcase }}"
+                 data-tags-en="{{ quiz.en.tags | join: ',' | downcase }}"
+                 data-tags-es="{{ quiz.es.tags | join: ',' | downcase }}"
+                 data-search-pt="{{ quiz.pt.title | downcase }} {{ quiz.pt.subtitle | downcase }} {{ quiz.pt.category | downcase }} {{ quiz.pt.tags | join: ' ' | downcase }}"
+                 data-search-en="{{ quiz.en.title | downcase }} {{ quiz.en.subtitle | downcase }} {{ quiz.en.category | downcase }} {{ quiz.en.tags | join: ' ' | downcase }}"
+                 data-search-es="{{ quiz.es.title | downcase }} {{ quiz.es.subtitle | downcase }} {{ quiz.es.category | downcase }} {{ quiz.es.tags | join: ' ' | downcase }}">
+          <a href="{{ quiz.url | relative_url }}" class="quiz-card-link">
+            <div class="card-visual">
+              <img src="{{ quiz.cover | relative_url }}" alt="" class="card-cover-img" loading="lazy">
+              <span class="card-tag-badge"
+                    data-text-pt="{{ quiz.pt.category }}"
+                    data-text-en="{{ quiz.en.category }}"
+                    data-text-es="{{ quiz.es.category }}">{{ quiz.pt.category }}</span>
+            </div>
+            <div class="card-body">
+              <div class="card-stats-row">
+                <span class="stat-badge tabular-nums">⏱ ~{{ quiz.est_minutes }} min</span>
+                <span class="stat-dot">·</span>
+                <span class="stat-badge card-stat-questions tabular-nums">
+                  {{ quiz.questions_count }} <span data-i18n="questions_label"></span>
+                </span>
+              </div>
+              <h2 class="card-title"
+                  data-text-pt="{{ quiz.pt.title }}"
+                  data-text-en="{{ quiz.en.title }}"
+                  data-text-es="{{ quiz.es.title }}">{{ quiz.pt.title }}</h2>
+              <p class="card-desc"
+                 data-text-pt="{{ quiz.pt.subtitle }}"
+                 data-text-en="{{ quiz.en.subtitle }}"
+                 data-text-es="{{ quiz.es.subtitle }}">{{ quiz.pt.subtitle }}</p>
+              <div class="card-footer">
+                <span class="card-cta-label" data-i18n="start_quiz"></span>
+                <svg class="card-cta-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </div>
+            </div>
+          </a>
+        </article>
+      {% endfor %}
+    </div>
 
     <div id="no-results-msg" class="empty-state" style="display: none;">
       <p id="no-results-text" class="empty-text" data-i18n="no_results"></p>
@@ -47,169 +89,5 @@ title: "Avaliações"
   </div>
 </section>
 
-<script>
-  window.QUIZZES = {{ site.data.quizzes | jsonify }};
-
-  (function() {
-    'use strict';
-
-    var searchInput = document.getElementById('quiz-search-input');
-    var tagFilterBar = document.getElementById('tag-filter-bar');
-    var catalogCollection = document.getElementById('quiz-catalog-collection');
-    var catalogCountLabel = document.getElementById('catalog-count-label');
-    var noResults = document.getElementById('no-results-msg');
-    var btnReset = document.getElementById('btn-reset-filters');
-
-    var activeTag = 'all';
-
-    function getLang() {
-      return (window.i18next && i18next.language) || window.CURRENT_LANG;
-    }
-
-    function renderTagFilterBar() {
-      var lang = getLang();
-      var quizzes = window.QUIZZES || [];
-      var tagSet = {};
-
-      quizzes.forEach(function(q) {
-        var loc = q[lang] || {};
-        (loc.tags || []).forEach(function(t) {
-          tagSet[t] = true;
-        });
-      });
-
-      var tags = Object.keys(tagSet);
-      tagFilterBar.innerHTML = '';
-
-      var allBtn = document.createElement('button');
-      allBtn.type = 'button';
-      allBtn.className = 'chip-btn' + (activeTag === 'all' ? ' active' : '');
-      allBtn.setAttribute('data-i18n', 'all_tags');
-      allBtn.textContent = i18next.t('all_tags');
-      allBtn.addEventListener('click', function() {
-        document.querySelectorAll('.chip-btn').forEach(function(b) { b.classList.remove('active'); });
-        allBtn.classList.add('active');
-        activeTag = 'all';
-        renderCards();
-      });
-      tagFilterBar.appendChild(allBtn);
-
-      tags.forEach(function(tag) {
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'chip-btn' + (activeTag === tag ? ' active' : '');
-        btn.textContent = '#' + tag;
-        btn.addEventListener('click', function() {
-          document.querySelectorAll('.chip-btn').forEach(function(b) { b.classList.remove('active'); });
-          btn.classList.add('active');
-          activeTag = tag;
-          renderCards();
-        });
-        tagFilterBar.appendChild(btn);
-      });
-    }
-
-    function renderCards() {
-      var lang = getLang();
-      var query = (searchInput ? searchInput.value : '').toLowerCase().trim();
-      var quizzes = window.QUIZZES || [];
-      var visibleCount = 0;
-
-      catalogCollection.innerHTML = '';
-
-      quizzes.forEach(function(q) {
-        var loc = q[lang] || {};
-        var title = loc.title || '';
-        var subtitle = loc.subtitle || '';
-        var category = loc.category || '';
-        var tags = loc.tags || [];
-
-        var matchesTag = (activeTag === 'all') || tags.some(function(tg) {
-          return tg.toLowerCase() === activeTag.toLowerCase();
-        });
-
-        var matchesQuery = !query ||
-          title.toLowerCase().indexOf(query) !== -1 ||
-          subtitle.toLowerCase().indexOf(query) !== -1 ||
-          category.toLowerCase().indexOf(query) !== -1 ||
-          tags.some(function(tg) { return tg.toLowerCase().indexOf(query) !== -1; });
-
-        if (matchesTag && matchesQuery) {
-          visibleCount++;
-          var card = document.createElement('article');
-          card.className = 'quiz-card';
-
-          var qLabel = i18next.t('questions_label');
-          var startLabel = i18next.t('start_quiz');
-
-          card.innerHTML =
-            '<a href="' + (q.url || '#') + '" class="quiz-card-link">' +
-              '<div class="card-visual">' +
-                '<img src="' + q.cover + '" alt="" class="card-cover-img" loading="lazy">' +
-                '<span class="card-tag-badge">' + category + '</span>' +
-              '</div>' +
-              '<div class="card-body">' +
-                '<div class="card-stats-row">' +
-                  '<span class="stat-badge tabular-nums">⏱ ~' + q.est_minutes + ' min</span>' +
-                  '<span class="stat-dot">·</span>' +
-                  '<span class="stat-badge card-stat-questions tabular-nums">' + q.questions_count + ' ' + qLabel + '</span>' +
-                '</div>' +
-                '<h2 class="card-title">' + title + '</h2>' +
-                '<p class="card-desc">' + subtitle + '</p>' +
-                '<div class="card-footer">' +
-                  '<span class="card-cta-label">' + startLabel + '</span>' +
-                  '<svg class="card-cta-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>' +
-                '</div>' +
-              '</div>' +
-            '</a>';
-
-          catalogCollection.appendChild(card);
-        }
-      });
-
-      if (catalogCountLabel) {
-        var countUnit = i18next.t('assessments_available');
-        catalogCountLabel.textContent = visibleCount + ' ' + countUnit;
-      }
-
-      if (noResults) {
-        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-      }
-    }
-
-    if (searchInput) {
-      searchInput.addEventListener('input', renderCards);
-    }
-
-    if (btnReset) {
-      btnReset.addEventListener('click', function() {
-        if (searchInput) searchInput.value = '';
-        activeTag = 'all';
-        renderTagFilterBar();
-        renderCards();
-      });
-    }
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === '/' && document.activeElement !== searchInput) {
-        e.preventDefault();
-        if (searchInput) {
-          searchInput.focus();
-          searchInput.select();
-        }
-      }
-    });
-
-    function update() {
-      renderTagFilterBar();
-      renderCards();
-    }
-
-    window.addEventListener('quiztide:i18nready', update);
-    window.addEventListener('quiztide:langchange', update);
-
-    if (window.isI18nReady) {
-      update();
-    }
-  })();
-</script>
+<!-- Catalog Controller (Filtering, Search, and Staggered Animations) -->
+<script src="{{ '/assets/js/catalog.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>

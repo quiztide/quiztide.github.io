@@ -1,12 +1,21 @@
 (function() {
   'use strict';
 
+  /* ==========================================================================
+     Quiztide - Assessment Quiz Engine
+     Smooth Interactive Motion Powered by Anime.js (Zero Text Fallbacks)
+     ========================================================================== */
+
   var baseUrl = window.QUIZ_BASE_URL || './';
   if (baseUrl.charAt(baseUrl.length - 1) !== '/') {
     baseUrl += '/';
   }
 
-  var currentLang = window.CURRENT_LANG || 'pt';
+  function getLang() {
+    return (window.i18next && i18next.language) || window.CURRENT_LANG || 'pt';
+  }
+
+  var currentLang = getLang();
   var quizData = null;
   var currentIndex = 0;
   var scores = {};
@@ -59,23 +68,6 @@
     return Math.ceil(questionCount * 0.35);
   }
 
-  function getUI(lang) {
-    var i18n = window.SITE_I18N || {};
-    return i18n[lang] || i18n.pt || {
-      back_to_catalog: '← Todos os testes',
-      step_label: 'Questão',
-      of: 'de',
-      questions_label: 'questões',
-      completed: 'Avaliação Concluída',
-      celebration: 'Resultado da Avaliação',
-      breakdown_title: 'Distribuição dos Seus Traços',
-      share_whatsapp: 'Compartilhar no WhatsApp',
-      copy_link: 'Copiar Link',
-      copied_success: 'Link copiado com sucesso!',
-      retake_quiz: 'Refazer Teste'
-    };
-  }
-
   function loadLocale(targetLang) {
     var url = baseUrl + 'locales/' + targetLang + '.json';
 
@@ -93,53 +85,60 @@
   }
 
   function updateHeader() {
-    if (!quizData) return;
-    var ui = getUI(currentLang);
+    if (!quizData || !window.i18next) return;
 
     if (quizBackLink) {
       var backSpan = quizBackLink.querySelector('span');
-      if (backSpan) {
-        backSpan.textContent = ui.back_to_catalog ? ui.back_to_catalog.replace('← ', '') : 'Todos os testes';
-      }
+      if (backSpan) backSpan.textContent = i18next.t('back_to_catalog');
     }
+
     if (quizTitle) quizTitle.textContent = quizData.title || '';
     if (quizSubtitle) quizSubtitle.textContent = quizData.subtitle || '';
-    if (quizCategoryPill) quizCategoryPill.textContent = quizData.category || 'Personalidade';
+    if (quizCategoryPill) quizCategoryPill.textContent = quizData.category || '';
 
-    var total = (quizData.questions || []).length;
+    var total = (quizData.questions && quizData.questions.length) ? quizData.questions.length : 1;
     var estMinutes = calculateEstMinutes(total);
     if (quizTimePill) quizTimePill.textContent = '~' + estMinutes + ' min';
 
-    if (btnCopyText) btnCopyText.textContent = ui.copy_link || 'Copiar Link';
-    if (btnWhatsappText) btnWhatsappText.textContent = ui.share_whatsapp || 'WhatsApp';
-    if (btnRestartText) btnRestartText.textContent = ui.retake_quiz || 'Refazer Teste';
-    if (resultCelebration) resultCelebration.textContent = ui.celebration || 'Resultado da Avaliação';
-    if (traitBreakdownTitle) traitBreakdownTitle.textContent = ui.breakdown_title || 'Distribuição dos Seus Traços';
-    if (copyFeedback) copyFeedback.textContent = ui.copied_success || 'Link copiado com sucesso!';
+    if (btnCopyText) btnCopyText.textContent = i18next.t('copy_link');
+    if (btnWhatsappText) btnWhatsappText.textContent = i18next.t('share_whatsapp');
+    if (btnRestartText) btnRestartText.textContent = i18next.t('retake_quiz');
+    if (resultCelebration) resultCelebration.textContent = i18next.t('celebration');
+    if (traitBreakdownTitle) traitBreakdownTitle.textContent = i18next.t('trait_breakdown');
+    if (copyFeedback) copyFeedback.textContent = i18next.t('copied_success');
   }
 
   function renderQuestion(index) {
-    if (!quizData || !quizData.questions) return;
+    if (!quizData || !quizData.questions || !window.i18next) return;
     var questions = quizData.questions;
     var totalQuestions = questions.length;
     var q = questions[index];
     if (!q) return;
 
-    var ui = getUI(currentLang);
     var currentNum = index + 1;
     var pct = Math.round((index / totalQuestions) * 100);
 
+    var stepWord = i18next.t('step_label');
+    var ofWord = i18next.t('of');
+
     if (questionEyebrow) {
-      questionEyebrow.textContent = (ui.step_label || 'QUESTÃO') + ' ' + (currentNum < 10 ? '0' + currentNum : currentNum);
+      questionEyebrow.textContent = stepWord.toUpperCase() + ' ' + (currentNum < 10 ? '0' + currentNum : currentNum);
     }
 
     if (progressText) {
-      progressText.innerHTML = (ui.step_label || 'Questão') + ' <span class="tabular-nums">' + (currentNum < 10 ? '0' + currentNum : currentNum) + '</span> ' + (ui.of || 'de') + ' <span class="tabular-nums">' + (totalQuestions < 10 ? '0' + totalQuestions : totalQuestions) + '</span>';
+      progressText.innerHTML = stepWord + ' <span class="tabular-nums">' + (currentNum < 10 ? '0' + currentNum : currentNum) + '</span> ' + ofWord + ' <span class="tabular-nums">' + (totalQuestions < 10 ? '0' + totalQuestions : totalQuestions) + '</span>';
     }
     if (progressPercent) {
       progressPercent.innerHTML = '<span class="tabular-nums">' + pct + '%</span>';
     }
-    if (progressFill) {
+    if (window.anime && progressFill) {
+      anime({
+        targets: progressFill,
+        width: pct + '%',
+        duration: 280,
+        easing: 'easeOutCubic'
+      });
+    } else if (progressFill) {
       progressFill.style.width = pct + '%';
     }
     if (progressBar) {
@@ -167,10 +166,10 @@
         btn.setAttribute('data-index', optIndex);
         btn.setAttribute('data-key', String.fromCharCode(65 + optIndex));
 
-        var inner = '<span class="option-key-badge">' + String.fromCharCode(65 + optIndex) + '</span>' +
+        btn.innerHTML =
+          '<span class="option-key-badge">' + String.fromCharCode(65 + optIndex) + '</span>' +
           '<span class="option-label-text">' + opt.text + '</span>';
 
-        btn.innerHTML = inner;
         btn.addEventListener('click', function() {
           handleOptionSelect(btn, opt.type);
         });
@@ -181,41 +180,59 @@
   }
 
   function handleOptionSelect(btnElement, resultType) {
+    if (!optionsList) return;
     var allBtns = optionsList.querySelectorAll('.quiz-option-button');
     allBtns.forEach(function(b) { b.classList.add('disabled'); });
     btnElement.classList.add('selected');
+
+    if (window.anime) {
+      anime({
+        targets: btnElement,
+        scale: [0.97, 1],
+        duration: 150,
+        easing: 'easeOutCubic'
+      });
+    }
 
     if (resultType) {
       scores[resultType] = (scores[resultType] || 0) + 1;
     }
 
-    if (questionFlow) {
-      questionFlow.classList.add('flow-exit');
+    if (window.anime && questionFlow) {
+      anime({
+        targets: questionFlow,
+        opacity: [1, 0],
+        translateX: [0, -16],
+        duration: 140,
+        easing: 'easeInCubic',
+        complete: function() {
+          currentIndex++;
+          var questions = (quizData && quizData.questions) ? quizData.questions : [];
+          if (currentIndex < questions.length) {
+            renderQuestion(currentIndex);
+            anime({
+              targets: questionFlow,
+              opacity: [0, 1],
+              translateX: [16, 0],
+              duration: 220,
+              easing: 'easeOutCubic'
+            });
+          } else {
+            showResults();
+          }
+        }
+      });
+    } else {
+      setTimeout(function() {
+        currentIndex++;
+        var questions = (quizData && quizData.questions) ? quizData.questions : [];
+        if (currentIndex < questions.length) {
+          renderQuestion(currentIndex);
+        } else {
+          showResults();
+        }
+      }, 120);
     }
-
-    setTimeout(function() {
-      currentIndex++;
-      var questions = (quizData && quizData.questions) ? quizData.questions : [];
-      if (currentIndex < questions.length) {
-        if (questionFlow) {
-          questionFlow.classList.remove('flow-exit');
-          questionFlow.classList.add('flow-enter-prep');
-        }
-        renderQuestion(currentIndex);
-        requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
-            if (questionFlow) {
-              questionFlow.classList.remove('flow-enter-prep');
-            }
-          });
-        });
-      } else {
-        if (questionFlow) {
-          questionFlow.classList.remove('flow-exit');
-        }
-        showResults();
-      }
-    }, 130);
   }
 
   // Keyboard shortcut listener (A, B, C, D or 1, 2, 3, 4)
@@ -241,14 +258,22 @@
 
   function showResults() {
     isFinished = true;
-    var ui = getUI(currentLang);
     var results = (quizData && quizData.results) ? quizData.results : {};
     var questions = (quizData && quizData.questions) ? quizData.questions : [];
     var totalQuestions = questions.length || 1;
 
-    if (progressText) progressText.innerHTML = ui.completed || 'Avaliação Concluída';
+    if (progressText) progressText.innerHTML = i18next.t('completed');
     if (progressPercent) progressPercent.innerHTML = '<span class="tabular-nums">100%</span>';
-    if (progressFill) progressFill.style.width = '100%';
+    if (window.anime && progressFill) {
+      anime({
+        targets: progressFill,
+        width: '100%',
+        duration: 320,
+        easing: 'easeOutCubic'
+      });
+    } else if (progressFill) {
+      progressFill.style.width = '100%';
+    }
     if (progressBar) progressBar.setAttribute('aria-valuenow', 100);
 
     // Calculate top trait
@@ -272,12 +297,23 @@
     if (questionCard) questionCard.style.display = 'none';
     if (resultCard) {
       resultCard.style.display = 'block';
-      resultCard.classList.add('result-enter-prep');
-      requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
-          resultCard.classList.remove('result-enter-prep');
+      if (window.anime) {
+        anime({
+          targets: resultCard,
+          opacity: [0, 1],
+          translateY: [16, 0],
+          duration: 360,
+          easing: 'easeOutCubic'
         });
-      });
+        anime({
+          targets: ['.result-celebration-pill', '.result-archetype-title', '.result-narrative-text', '.trait-breakdown-card', '.result-cta-panel'],
+          opacity: [0, 1],
+          translateY: [8, 0],
+          delay: anime.stagger(45, { start: 80 }),
+          duration: 320,
+          easing: 'easeOutCubic'
+        });
+      }
     }
 
     if (winner.image && resultImg && resultImgWrapper) {
@@ -315,30 +351,32 @@
 
         var barRow = document.createElement('div');
         barRow.className = 'breakdown-bar-item';
-        barRow.innerHTML = '<div class="bar-info-row">' +
-          '<span class="bar-trait-title">' + (rItem.badge ? rItem.badge + ' ' : '') + rItem.title + '</span>' +
-          '<span class="bar-trait-value tabular-nums">' + percentage + '%</span>' +
-        '</div>' +
-        '<div class="bar-track-wrap">' +
-          '<div class="bar-fill-amount' + (rk === winningKey ? ' is-winner' : '') + '" style="width: 0%;"></div>' +
-        '</div>';
+        barRow.innerHTML =
+          '<div class="bar-info-row">' +
+            '<span class="bar-trait-title">' + (rItem.badge ? rItem.badge + ' ' : '') + rItem.title + '</span>' +
+            '<span class="bar-trait-value tabular-nums">' + percentage + '%</span>' +
+          '</div>' +
+          '<div class="bar-track-wrap">' +
+            '<div class="bar-fill-amount' + (rk === winningKey ? ' is-winner' : '') + '" data-target="' + percentage + '" style="width: 0%;"></div>' +
+          '</div>';
 
         traitBarsContainer.appendChild(barRow);
       }
 
-      // Smoothly expand bars to final width in next animation frame
-      requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
-          var fillBars = traitBarsContainer.querySelectorAll('.bar-fill-amount');
-          var keys = Object.keys(results);
-          fillBars.forEach(function(bar, idx) {
-            var k = keys[idx];
-            var cnt = scores[k] || 0;
-            var pct = Math.round((cnt / totalAnswered) * 100);
-            bar.style.width = pct + '%';
-          });
+      if (window.anime) {
+        anime({
+          targets: '.bar-fill-amount',
+          width: function(el) { return el.getAttribute('data-target') + '%'; },
+          duration: 650,
+          delay: anime.stagger(60, { start: 220 }),
+          easing: 'easeOutQuart'
         });
-      });
+      } else {
+        var fillBars = traitBarsContainer.querySelectorAll('.bar-fill-amount');
+        fillBars.forEach(function(bar) {
+          bar.style.width = bar.getAttribute('data-target') + '%';
+        });
+      }
     }
 
     resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -351,18 +389,34 @@
     isFinished = false;
 
     if (resultCard) resultCard.style.display = 'none';
-    if (questionCard) questionCard.style.display = 'block';
+    if (questionCard) {
+      questionCard.style.display = 'block';
+      questionCard.style.opacity = '0';
+    }
 
-    loadLocale(targetLang || currentLang).then(function() {
+    loadLocale(targetLang || getLang()).then(function() {
       updateHeader();
       renderQuestion(currentIndex);
+      if (questionCard) {
+        if (window.anime) {
+          anime({
+            targets: questionCard,
+            opacity: [0, 1],
+            translateY: [10, 0],
+            duration: 280,
+            easing: 'easeOutCubic'
+          });
+        } else {
+          questionCard.style.opacity = '1';
+        }
+      }
     });
   }
 
   // Social Share Handlers
   if (btnWhatsapp) {
     btnWhatsapp.addEventListener('click', function() {
-      if (!quizData) return;
+      if (!quizData || !window.i18next) return;
       var results = quizData.results || {};
       var winner = results[winningKey] || Object.values(results)[0];
       if (!winner) return;
@@ -382,7 +436,30 @@
       navigator.clipboard.writeText(window.location.href).then(function() {
         if (copyFeedback) {
           copyFeedback.style.display = 'block';
-          setTimeout(function() { copyFeedback.style.display = 'none'; }, 2200);
+          if (window.anime) {
+            anime({
+              targets: copyFeedback,
+              opacity: [0, 1],
+              translateY: [6, 0],
+              duration: 200,
+              easing: 'easeOutBack'
+            });
+          }
+          setTimeout(function() {
+            if (window.anime) {
+              anime({
+                targets: copyFeedback,
+                opacity: [1, 0],
+                duration: 180,
+                easing: 'easeInQuad',
+                complete: function() {
+                  copyFeedback.style.display = 'none';
+                }
+              });
+            } else {
+              copyFeedback.style.display = 'none';
+            }
+          }, 2200);
         }
       });
     });
@@ -390,13 +467,13 @@
 
   if (btnRestart) {
     btnRestart.addEventListener('click', function() {
-      initQuiz(currentLang);
+      initQuiz(getLang());
     });
   }
 
   // Reactive mid-quiz language switch
   window.addEventListener('quiztide:langchange', function(e) {
-    var newLang = e.detail.lang || 'pt';
+    var newLang = e.detail.lang || getLang();
     loadLocale(newLang).then(function() {
       updateHeader();
       if (isFinished) {
@@ -408,5 +485,5 @@
   });
 
   // Start
-  initQuiz(currentLang);
+  initQuiz(getLang());
 })();
