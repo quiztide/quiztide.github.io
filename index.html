@@ -138,6 +138,7 @@ title: "Avaliações"
           visibleCount++;
           var card = document.createElement('article');
           card.className = 'quiz-card';
+          card.style.setProperty('--card-index', visibleCount - 1);
 
           var qLabel = i18next.t('questions_label');
           var startLabel = i18next.t('start_quiz');
