@@ -38,25 +38,27 @@ layout: default
 
     <!-- Active Question Card -->
     <div id="quiz-question-card" class="question-card-surface">
-      <div id="quiz-question-img-wrapper" class="question-media-wrapper" style="display: none;">
-        <img id="quiz-question-img" src="" alt="" class="question-media-img">
-      </div>
-      
-      <div class="question-eyebrow-row">
-        <span class="question-eyebrow-tag" id="question-eyebrow"></span>
-      </div>
-      <h2 id="quiz-question-title" class="question-prompt-text"></h2>
+      <div id="quiz-question-flow" class="question-flow-body">
+        <div id="quiz-question-img-wrapper" class="question-media-wrapper" style="display: none;">
+          <img id="quiz-question-img" src="" alt="" class="question-media-img">
+        </div>
+        
+        <div class="question-eyebrow-row">
+          <span class="question-eyebrow-tag" id="question-eyebrow"></span>
+        </div>
+        <h2 id="quiz-question-title" class="question-prompt-text"></h2>
 
-      <!-- Keyboard shortcuts guide -->
-      <div class="keyboard-guide-bar" id="keyboard-tip-bar">
-        <kbd class="guide-key">A</kbd>
-        <kbd class="guide-key">B</kbd>
-        <kbd class="guide-key">C</kbd>
-        <kbd class="guide-key">D</kbd>
-      </div>
+        <!-- Keyboard shortcuts guide -->
+        <div class="keyboard-guide-bar" id="keyboard-tip-bar">
+          <kbd class="guide-key">A</kbd>
+          <kbd class="guide-key">B</kbd>
+          <kbd class="guide-key">C</kbd>
+          <kbd class="guide-key">D</kbd>
+        </div>
 
-      <!-- Options Container -->
-      <div id="quiz-options-list" class="options-wrapper" role="group"></div>
+        <!-- Options Container -->
+        <div id="quiz-options-list" class="options-wrapper" role="group"></div>
+      </div>
     </div>
 
     <!-- Quiz Result Screen (Initially Hidden) -->

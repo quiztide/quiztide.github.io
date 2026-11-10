@@ -27,6 +27,7 @@
   var progressBar = document.getElementById('quiz-progress-bar');
 
   var questionCard = document.getElementById('quiz-question-card');
+  var questionFlow = document.getElementById('quiz-question-flow');
   var questionEyebrow = document.getElementById('question-eyebrow');
   var questionImgWrapper = document.getElementById('quiz-question-img-wrapper');
   var questionImg = document.getElementById('quiz-question-img');
@@ -188,15 +189,33 @@
       scores[resultType] = (scores[resultType] || 0) + 1;
     }
 
+    if (questionFlow) {
+      questionFlow.classList.add('flow-exit');
+    }
+
     setTimeout(function() {
       currentIndex++;
       var questions = (quizData && quizData.questions) ? quizData.questions : [];
       if (currentIndex < questions.length) {
+        if (questionFlow) {
+          questionFlow.classList.remove('flow-exit');
+          questionFlow.classList.add('flow-enter-prep');
+        }
         renderQuestion(currentIndex);
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            if (questionFlow) {
+              questionFlow.classList.remove('flow-enter-prep');
+            }
+          });
+        });
       } else {
+        if (questionFlow) {
+          questionFlow.classList.remove('flow-exit');
+        }
         showResults();
       }
-    }, 120);
+    }, 130);
   }
 
   // Keyboard shortcut listener (A, B, C, D or 1, 2, 3, 4)
@@ -251,7 +270,15 @@
     if (!winner) return;
 
     if (questionCard) questionCard.style.display = 'none';
-    if (resultCard) resultCard.style.display = 'block';
+    if (resultCard) {
+      resultCard.style.display = 'block';
+      resultCard.classList.add('result-enter-prep');
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          resultCard.classList.remove('result-enter-prep');
+        });
+      });
+    }
 
     if (winner.image && resultImg && resultImgWrapper) {
       resultImg.src = baseUrl + winner.image;
@@ -293,11 +320,25 @@
           '<span class="bar-trait-value tabular-nums">' + percentage + '%</span>' +
         '</div>' +
         '<div class="bar-track-wrap">' +
-          '<div class="bar-fill-amount' + (rk === winningKey ? ' is-winner' : '') + '" style="width: ' + percentage + '%;"></div>' +
+          '<div class="bar-fill-amount' + (rk === winningKey ? ' is-winner' : '') + '" style="width: 0%;"></div>' +
         '</div>';
 
         traitBarsContainer.appendChild(barRow);
       }
+
+      // Smoothly expand bars to final width in next animation frame
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          var fillBars = traitBarsContainer.querySelectorAll('.bar-fill-amount');
+          var keys = Object.keys(results);
+          fillBars.forEach(function(bar, idx) {
+            var k = keys[idx];
+            var cnt = scores[k] || 0;
+            var pct = Math.round((cnt / totalAnswered) * 100);
+            bar.style.width = pct + '%';
+          });
+        });
+      });
     }
 
     resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });

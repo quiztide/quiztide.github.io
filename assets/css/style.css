@@ -41,6 +41,9 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
   --shadow-card-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+
+  /* Fluid Motion */
+  --ease-fluid: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ==========================================================================
@@ -517,14 +520,21 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-card);
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition: transform 220ms var(--ease-fluid),
+              border-color 220ms var(--ease-fluid),
+              box-shadow 220ms var(--ease-fluid);
   display: flex;
   flex-direction: column;
 }
 
 .quiz-card:hover {
+  transform: translateY(-2px);
   border-color: var(--border-hover);
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+.quiz-card:active {
+  transform: translateY(0);
 }
 
 .quiz-card-link {
@@ -624,6 +634,11 @@ details.lang-dropdown[open] .lang-dropdown-menu {
 
 .card-cta-arrow {
   color: var(--text-primary);
+  transition: transform 180ms var(--ease-fluid);
+}
+
+.quiz-card:hover .card-cta-arrow {
+  transform: translateX(3px);
 }
 
 /* ==========================================================================
@@ -739,7 +754,7 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   height: 100%;
   background: var(--border-dark);
   border-radius: var(--radius-full);
-  transition: width 200ms ease;
+  transition: width 350ms var(--ease-fluid);
 }
 
 /* Question Active Card Surface */
@@ -749,6 +764,22 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   border-radius: var(--radius-xl);
   padding: 32px 28px;
   box-shadow: var(--shadow-card);
+}
+
+.question-flow-body {
+  transition: opacity 160ms var(--ease-fluid), transform 160ms var(--ease-fluid);
+  will-change: opacity, transform;
+}
+
+.question-flow-body.flow-exit {
+  opacity: 0;
+  transform: translateX(-14px);
+}
+
+.question-flow-body.flow-enter-prep {
+  opacity: 0;
+  transform: translateX(14px);
+  transition: none;
 }
 
 .question-media-wrapper {
@@ -826,13 +857,17 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   color: var(--text-primary);
   cursor: pointer;
   text-align: left;
-  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+  transition: background-color 160ms var(--ease-fluid),
+              border-color 160ms var(--ease-fluid),
+              color 160ms var(--ease-fluid),
+              transform 160ms var(--ease-fluid);
   box-shadow: var(--shadow-sm);
 }
 
 .quiz-option-button:hover:not(.disabled) {
   background: #f8fafc;
   border-color: var(--border-hover);
+  transform: translateX(3px);
 }
 
 .quiz-option-button.selected {
@@ -840,6 +875,7 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   border-color: var(--border-dark);
   color: var(--text-inverse);
   font-weight: 500;
+  transform: translateX(0);
 }
 
 .quiz-option-button.selected .option-key-badge {
@@ -883,6 +919,14 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   border-radius: var(--radius-xl);
   padding: 36px 32px;
   box-shadow: var(--shadow-card);
+  transition: opacity 280ms var(--ease-fluid), transform 280ms var(--ease-fluid);
+  will-change: opacity, transform;
+}
+
+.result-card-surface.result-enter-prep {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: none;
 }
 
 .result-celebration-pill {
@@ -995,7 +1039,7 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   height: 100%;
   background: #94a3b8;
   border-radius: var(--radius-full);
-  transition: width 200ms ease;
+  transition: width 450ms var(--ease-fluid);
 }
 
 .bar-fill-amount.is-winner {
