@@ -4,8 +4,7 @@ description: "Discover your true archetype, personality traits, and test your kn
 url: "https://quiztide.github.io"
 baseurl: ""
 
-# Supported site languages
-languages: ["pt", "en", "es"]
+# Default fallback language
 default_lang: "pt"
 
 # Plugins supported by GitHub Pages

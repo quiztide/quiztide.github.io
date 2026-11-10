@@ -39,22 +39,15 @@ title: "Avaliações"
     </div>
 
     <div class="quiz-grid" id="quiz-catalog-collection">
+      {% assign default_lang = site.default_lang %}
       {% for quiz in site.data.quizzes %}
-        <article class="quiz-card"
-                 data-quiz-id="{{ quiz.id }}"
-                 data-tags-pt="{{ quiz.pt.tags | join: ',' | downcase }}"
-                 data-tags-en="{{ quiz.en.tags | join: ',' | downcase }}"
-                 data-tags-es="{{ quiz.es.tags | join: ',' | downcase }}"
-                 data-search-pt="{{ quiz.pt.title | downcase }} {{ quiz.pt.subtitle | downcase }} {{ quiz.pt.category | downcase }} {{ quiz.pt.tags | join: ' ' | downcase }}"
-                 data-search-en="{{ quiz.en.title | downcase }} {{ quiz.en.subtitle | downcase }} {{ quiz.en.category | downcase }} {{ quiz.en.tags | join: ' ' | downcase }}"
-                 data-search-es="{{ quiz.es.title | downcase }} {{ quiz.es.subtitle | downcase }} {{ quiz.es.category | downcase }} {{ quiz.es.tags | join: ' ' | downcase }}">
+        {% assign initial_info = quiz[default_lang] %}
+        <article class="quiz-card" data-quiz-id="{{ quiz.id }}">
+          <script type="application/json" class="quiz-card-data">{{ quiz | jsonify }}</script>
           <a href="{{ quiz.url | relative_url }}" class="quiz-card-link">
             <div class="card-visual">
               <img src="{{ quiz.cover | relative_url }}" alt="" class="card-cover-img" loading="lazy">
-              <span class="card-tag-badge"
-                    data-text-pt="{{ quiz.pt.category }}"
-                    data-text-en="{{ quiz.en.category }}"
-                    data-text-es="{{ quiz.es.category }}">{{ quiz.pt.category }}</span>
+              <span class="card-tag-badge">{{ initial_info.category }}</span>
             </div>
             <div class="card-body">
               <div class="card-stats-row">
@@ -64,14 +57,8 @@ title: "Avaliações"
                   {{ quiz.questions_count }} <span data-i18n="questions_label"></span>
                 </span>
               </div>
-              <h2 class="card-title"
-                  data-text-pt="{{ quiz.pt.title }}"
-                  data-text-en="{{ quiz.en.title }}"
-                  data-text-es="{{ quiz.es.title }}">{{ quiz.pt.title }}</h2>
-              <p class="card-desc"
-                 data-text-pt="{{ quiz.pt.subtitle }}"
-                 data-text-en="{{ quiz.en.subtitle }}"
-                 data-text-es="{{ quiz.es.subtitle }}">{{ quiz.pt.subtitle }}</p>
+              <h2 class="card-title">{{ initial_info.title }}</h2>
+              <p class="card-desc">{{ initial_info.subtitle }}</p>
               <div class="card-footer">
                 <span class="card-cta-label" data-i18n="start_quiz"></span>
                 <svg class="card-cta-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="{{ site.default_lang }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -29,19 +29,21 @@
   <!-- Synchronous i18n Initialization in <head> -->
   <script>
     (function() {
+      window.DEFAULT_LANG = {{ site.default_lang | jsonify }};
       window.LANGUAGES = {{ site.data.languages | jsonify }};
-      window.CURRENT_LANG = localStorage.getItem('quiztide_lang') || 'pt';
+      window.CURRENT_LANG = localStorage.getItem('quiztide_lang') || window.DEFAULT_LANG;
       document.documentElement.lang = window.CURRENT_LANG;
       window.isI18nReady = false;
+
+      var resources = {};
+      {% for item in site.data.i18n %}
+        resources[{{ item[0] | jsonify }}] = { translation: {{ item[1] | jsonify }} };
+      {% endfor %}
 
       if (window.i18next && window.locI18next) {
         i18next.init({
           lng: window.CURRENT_LANG,
-          resources: {
-            pt: { translation: {{ site.data.i18n.pt | jsonify }} },
-            en: { translation: {{ site.data.i18n.en | jsonify }} },
-            es: { translation: {{ site.data.i18n.es | jsonify }} }
-          }
+          resources: resources
         }, function() {
           window.localize = locI18next.init(i18next);
           window.isI18nReady = true;

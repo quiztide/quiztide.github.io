@@ -12,7 +12,7 @@
   }
 
   function getLang() {
-    return (window.i18next && i18next.language) || window.CURRENT_LANG || 'pt';
+    return (window.i18next && i18next.language) || window.CURRENT_LANG || window.DEFAULT_LANG;
   }
 
   var currentLang = getLang();
@@ -81,6 +81,18 @@
         quizData = data;
         if (quizLangNotice) quizLangNotice.style.display = 'none';
         return data;
+      })
+      .catch(function(err) {
+        if (window.DEFAULT_LANG && targetLang !== window.DEFAULT_LANG) {
+          return loadLocale(window.DEFAULT_LANG).then(function(data) {
+            if (quizLangNotice && window.i18next) {
+              quizLangNotice.textContent = i18next.t('lang_not_available');
+              quizLangNotice.style.display = 'block';
+            }
+            return data;
+          });
+        }
+        throw err;
       });
   }
 

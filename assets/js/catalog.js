@@ -4,6 +4,7 @@
   /* ==========================================================================
      Quiztide - Catalog Controller
      Scalable DOM-based Filtering, Live Search, and Fluid Animations with Anime.js
+     (100% Language-Agnostic, Zero Text Fallbacks)
      ========================================================================== */
 
   var searchInput = document.getElementById('quiz-search-input');
@@ -14,29 +15,44 @@
   var cards = document.querySelectorAll('.quiz-card');
 
   var activeTag = 'all';
+  var cardsData = {};
+
+  // Extract embedded JSON data from statically rendered cards
+  cards.forEach(function(card) {
+    var id = card.getAttribute('data-quiz-id');
+    var scriptEl = card.querySelector('.quiz-card-data');
+    if (scriptEl && id) {
+      try {
+        cardsData[id] = JSON.parse(scriptEl.textContent);
+      } catch (err) {
+        console.error('Error parsing card data for ' + id, err);
+      }
+    }
+  });
 
   function getLang() {
-    return (window.i18next && i18next.language) || window.CURRENT_LANG || 'pt';
+    return (window.i18next && i18next.language) || window.CURRENT_LANG || window.DEFAULT_LANG;
+  }
+
+  function getLocalizedQuiz(id, lang) {
+    var q = cardsData[id];
+    if (!q) return null;
+    return q[lang] || (window.DEFAULT_LANG ? q[window.DEFAULT_LANG] : null) || null;
   }
 
   function updateCardTexts(lang) {
     cards.forEach(function(card) {
+      var id = card.getAttribute('data-quiz-id');
+      var loc = getLocalizedQuiz(id, lang);
+      if (!loc) return;
+
       var titleEl = card.querySelector('.card-title');
       var descEl = card.querySelector('.card-desc');
       var catEl = card.querySelector('.card-tag-badge');
 
-      if (titleEl) {
-        var t = titleEl.getAttribute('data-text-' + lang);
-        if (t) titleEl.textContent = t;
-      }
-      if (descEl) {
-        var d = descEl.getAttribute('data-text-' + lang);
-        if (d) descEl.textContent = d;
-      }
-      if (catEl) {
-        var c = catEl.getAttribute('data-text-' + lang);
-        if (c) catEl.textContent = c;
-      }
+      if (titleEl && loc.title) titleEl.textContent = loc.title;
+      if (descEl && loc.subtitle) descEl.textContent = loc.subtitle;
+      if (catEl && loc.category) catEl.textContent = loc.category;
     });
   }
 
@@ -46,11 +62,14 @@
     var tagSet = {};
 
     cards.forEach(function(card) {
-      var rawTags = card.getAttribute('data-tags-' + lang) || '';
-      rawTags.split(',').forEach(function(t) {
-        var clean = t.trim();
-        if (clean) tagSet[clean] = true;
-      });
+      var id = card.getAttribute('data-quiz-id');
+      var loc = getLocalizedQuiz(id, lang);
+      if (loc && Array.isArray(loc.tags)) {
+        loc.tags.forEach(function(t) {
+          var clean = t.trim();
+          if (clean) tagSet[clean] = true;
+        });
+      }
     });
 
     var tags = Object.keys(tagSet);
@@ -60,7 +79,7 @@
     allBtn.type = 'button';
     allBtn.className = 'chip-btn' + (activeTag === 'all' ? ' active' : '');
     allBtn.setAttribute('data-i18n', 'all_tags');
-    allBtn.textContent = (window.i18next && i18next.t('all_tags')) || 'Todos';
+    allBtn.textContent = (window.i18next && i18next.t('all_tags')) || '';
     allBtn.addEventListener('click', function() {
       tagFilterBar.querySelectorAll('.chip-btn').forEach(function(b) { b.classList.remove('active'); });
       allBtn.classList.add('active');
@@ -72,12 +91,12 @@
     tags.forEach(function(tag) {
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'chip-btn' + (activeTag === tag ? ' active' : '');
+      btn.className = 'chip-btn' + (activeTag === tag.toLowerCase() ? ' active' : '');
       btn.textContent = '#' + tag;
       btn.addEventListener('click', function() {
         tagFilterBar.querySelectorAll('.chip-btn').forEach(function(b) { b.classList.remove('active'); });
         btn.classList.add('active');
-        activeTag = tag;
+        activeTag = tag.toLowerCase();
         filterCards();
       });
       tagFilterBar.appendChild(btn);
@@ -90,10 +109,19 @@
     var visibleCount = 0;
 
     cards.forEach(function(card) {
-      var tags = (card.getAttribute('data-tags-' + lang) || '').split(',');
-      var matchesTag = (activeTag === 'all') || tags.indexOf(activeTag.toLowerCase()) !== -1;
-      var searchData = (card.getAttribute('data-search-' + lang) || '').toLowerCase();
-      var matchesQuery = !query || searchData.indexOf(query) !== -1;
+      var id = card.getAttribute('data-quiz-id');
+      var loc = getLocalizedQuiz(id, lang);
+
+      if (!loc) {
+        card.classList.add('is-hidden');
+        return;
+      }
+
+      var tags = (loc.tags || []).map(function(t) { return t.toLowerCase(); });
+      var matchesTag = (activeTag === 'all') || (tags.indexOf(activeTag.toLowerCase()) !== -1);
+
+      var searchText = ((loc.title || '') + ' ' + (loc.subtitle || '') + ' ' + (loc.category || '') + ' ' + tags.join(' ')).toLowerCase();
+      var matchesQuery = !query || searchText.indexOf(query) !== -1;
 
       var isVisible = matchesTag && matchesQuery;
       card.classList.toggle('is-hidden', !isVisible);
