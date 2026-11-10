@@ -11,30 +11,81 @@
           </div>
           <span class="footer-brand-name">Quiztide</span>
         </div>
-        <p class="footer-tagline" data-i18n="site_tagline"></p>
+        <p class="footer-tagline">
+          {% for item in site.data.i18n %}
+            <span data-lang="{{ item[0] }}">{{ item[1].site_tagline }}</span>
+          {% endfor %}
+        </p>
       </div>
 
       <div class="footer-nav-col">
-        <h4 class="footer-heading" data-i18n="nav_heading"></h4>
+        <h4 class="footer-heading">
+          {% for item in site.data.i18n %}
+            <span data-lang="{{ item[0] }}">{{ item[1].nav_heading }}</span>
+          {% endfor %}
+        </h4>
         <ul class="footer-links">
-          <li><a href="{{ '/' | relative_url }}" class="footer-link" data-i18n="nav_home"></a></li>
-          <li><a href="{{ '/about/' | relative_url }}" class="footer-link" data-i18n="nav_about"></a></li>
-          <li><a href="{{ '/contact/' | relative_url }}" class="footer-link" data-i18n="nav_contact"></a></li>
+          <li>
+            <a href="{{ '/' | relative_url }}" class="footer-link">
+              {% for item in site.data.i18n %}
+                <span data-lang="{{ item[0] }}">{{ item[1].nav_home }}</span>
+              {% endfor %}
+            </a>
+          </li>
+          <li>
+            <a href="{{ '/about/' | relative_url }}" class="footer-link">
+              {% for item in site.data.i18n %}
+                <span data-lang="{{ item[0] }}">{{ item[1].nav_about }}</span>
+              {% endfor %}
+            </a>
+          </li>
+          <li>
+            <a href="{{ '/contact/' | relative_url }}" class="footer-link">
+              {% for item in site.data.i18n %}
+                <span data-lang="{{ item[0] }}">{{ item[1].nav_contact }}</span>
+              {% endfor %}
+            </a>
+          </li>
         </ul>
       </div>
 
       <div class="footer-nav-col">
-        <h4 class="footer-heading" data-i18n="legal_heading"></h4>
+        <h4 class="footer-heading">
+          {% for item in site.data.i18n %}
+            <span data-lang="{{ item[0] }}">{{ item[1].legal_heading }}</span>
+          {% endfor %}
+        </h4>
         <ul class="footer-links">
-          <li><a href="{{ '/privacy/' | relative_url }}" class="footer-link" data-i18n="nav_privacy"></a></li>
-          <li><a href="{{ '/terms/' | relative_url }}" class="footer-link" data-i18n="nav_terms"></a></li>
+          <li>
+            <a href="{{ '/privacy/' | relative_url }}" class="footer-link">
+              {% for item in site.data.i18n %}
+                <span data-lang="{{ item[0] }}">{{ item[1].nav_privacy }}</span>
+              {% endfor %}
+            </a>
+          </li>
+          <li>
+            <a href="{{ '/terms/' | relative_url }}" class="footer-link">
+              {% for item in site.data.i18n %}
+                <span data-lang="{{ item[0] }}">{{ item[1].nav_terms }}</span>
+              {% endfor %}
+            </a>
+          </li>
         </ul>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <p class="footer-copyright">&copy; {{ 'now' | date: "%Y" }} Quiztide. <span data-i18n="all_rights_reserved"></span></p>
-      <span class="footer-status-pill"><span class="status-dot"></span> <span data-i18n="active_assessments"></span></span>
+      <p class="footer-copyright">&copy; {{ 'now' | date: "%Y" }} Quiztide.
+        {% for item in site.data.i18n %}
+          <span data-lang="{{ item[0] }}">{{ item[1].all_rights_reserved }}</span>
+        {% endfor %}
+      </p>
+      <span class="footer-status-pill">
+        <span class="status-dot"></span>
+        {% for item in site.data.i18n %}
+          <span data-lang="{{ item[0] }}">{{ item[1].active_assessments }}</span>
+        {% endfor %}
+      </span>
     </div>
   </div>
 </footer>

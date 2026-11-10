@@ -8,10 +8,20 @@ title: "Avaliações"
   <div class="hero-container">
     <div class="hero-badge">
       <span class="badge-dot"></span>
-      <span data-i18n="hero_badge"></span>
+      {% for item in site.data.i18n %}
+        <span data-lang="{{ item[0] }}">{{ item[1].hero_badge }}</span>
+      {% endfor %}
     </div>
-    <h1 class="hero-title" data-i18n="hero_title"></h1>
-    <p class="hero-subtitle" data-i18n="hero_subtitle"></p>
+    <h1 class="hero-title">
+      {% for item in site.data.i18n %}
+        <span data-lang="{{ item[0] }}">{{ item[1].hero_title }}</span>
+      {% endfor %}
+    </h1>
+    <p class="hero-subtitle">
+      {% for item in site.data.i18n %}
+        <span data-lang="{{ item[0] }}">{{ item[1].hero_subtitle }}</span>
+      {% endfor %}
+    </p>
   </div>
 </section>
 
@@ -23,15 +33,44 @@ title: "Avaliações"
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" id="quiz-search-input" data-i18n="[placeholder]search_placeholder;[aria-label]search_placeholder" class="search-input">
+      {% for item in site.data.i18n %}
+        <input type="text"
+               class="search-input"
+               data-lang="{{ item[0] }}"
+               data-search-input="true"
+               placeholder="{{ item[1].search_placeholder }}"
+               aria-label="{{ item[1].search_placeholder }}">
+      {% endfor %}
       <kbd class="search-shortcut" title="Search">/</kbd>
     </div>
 
-    <div class="filter-chips-bar" id="tag-filter-bar" role="toolbar"></div>
+    <!-- Liquid Pre-rendered Tag Filters for Each Language -->
+    <div class="filter-chips-bar" id="tag-filter-bar" role="toolbar">
+      {% for item in site.data.languages %}
+        {% assign lang = item[0] %}
+        <div class="tag-chips-lang-group" data-lang="{{ lang }}">
+          <button type="button" class="chip-btn active" data-tag="all">
+            {{ site.data.i18n[lang].all_tags }}
+          </button>
+          {% assign lang_tags = "" | split: "" %}
+          {% for quiz in site.data.quizzes %}
+            {% if quiz[lang] and quiz[lang].tags %}
+              {% for tag in quiz[lang].tags %}
+                {% assign lang_tags = lang_tags | push: tag %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+          {% assign unique_tags = lang_tags | uniq | sort %}
+          {% for tag in unique_tags %}
+            <button type="button" class="chip-btn" data-tag="{{ tag | downcase }}">#{{ tag }}</button>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
   </div>
 </section>
 
-<!-- Cards Catalog Grid (Rendered Statically at Build Time) -->
+<!-- Cards Catalog Grid (Rendered Statically at Build Time with Liquid) -->
 <section class="catalog-section">
   <div class="catalog-container">
     <div class="catalog-meta">
@@ -39,28 +78,58 @@ title: "Avaliações"
     </div>
 
     <div class="quiz-grid" id="quiz-catalog-collection">
-      {% assign default_lang = site.default_lang %}
       {% for quiz in site.data.quizzes %}
-        {% assign initial_info = quiz[default_lang] %}
-        <article class="quiz-card" data-quiz-id="{{ quiz.id }}">
-          <script type="application/json" class="quiz-card-data">{{ quiz | jsonify }}</script>
+        {% assign quiz_langs = "" | split: "" %}
+        {% for item in site.data.languages %}
+          {% assign l = item[0] %}
+          {% if quiz[l] %}
+            {% assign quiz_langs = quiz_langs | push: l %}
+          {% endif %}
+        {% endfor %}
+        <article class="quiz-card" data-quiz-id="{{ quiz.id }}" data-quiz-langs="{{ quiz_langs | join: ' ' }}">
+          <!-- Search & Tag Metadata Pre-rendered by Liquid for each language -->
+          {% for item in site.data.languages %}
+            {% assign l = item[0] %}
+            {% if quiz[l] %}
+              <span class="quiz-meta-data"
+                    data-lang="{{ l }}"
+                    data-tags="{{ quiz[l].tags | join: ',' | downcase }}"
+                    data-search="{{ quiz[l].title | downcase }} {{ quiz[l].subtitle | downcase }} {{ quiz[l].category | downcase }} {{ quiz[l].tags | join: ' ' | downcase }}"
+                    style="display:none;"></span>
+            {% endif %}
+          {% endfor %}
           <a href="{{ quiz.url | relative_url }}" class="quiz-card-link">
             <div class="card-visual">
               <img src="{{ quiz.cover | relative_url }}" alt="" class="card-cover-img" loading="lazy">
-              <span class="card-tag-badge">{{ initial_info.category }}</span>
+              {% for item in site.data.languages %}
+                {% assign l = item[0] %}
+                {% if quiz[l] %}
+                  <span class="card-tag-badge" data-lang="{{ l }}">{{ quiz[l].category }}</span>
+                {% endif %}
+              {% endfor %}
             </div>
             <div class="card-body">
               <div class="card-stats-row">
                 <span class="stat-badge tabular-nums">⏱ ~{{ quiz.est_minutes }} min</span>
                 <span class="stat-dot">·</span>
                 <span class="stat-badge card-stat-questions tabular-nums">
-                  {{ quiz.questions_count }} <span data-i18n="questions_label"></span>
+                  {{ quiz.questions_count }}
+                  {% for item in site.data.i18n %}
+                    <span data-lang="{{ item[0] }}">{{ item[1].questions_label }}</span>
+                  {% endfor %}
                 </span>
               </div>
-              <h2 class="card-title">{{ initial_info.title }}</h2>
-              <p class="card-desc">{{ initial_info.subtitle }}</p>
+              {% for item in site.data.languages %}
+                {% assign l = item[0] %}
+                {% if quiz[l] %}
+                  <h2 class="card-title" data-lang="{{ l }}">{{ quiz[l].title }}</h2>
+                  <p class="card-desc" data-lang="{{ l }}">{{ quiz[l].subtitle }}</p>
+                {% endif %}
+              {% endfor %}
               <div class="card-footer">
-                <span class="card-cta-label" data-i18n="start_quiz"></span>
+                {% for item in site.data.i18n %}
+                  <span class="card-cta-label" data-lang="{{ item[0] }}">{{ item[1].start_quiz }}</span>
+                {% endfor %}
                 <svg class="card-cta-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
               </div>
             </div>
@@ -70,11 +139,26 @@ title: "Avaliações"
     </div>
 
     <div id="no-results-msg" class="empty-state" style="display: none;">
-      <p id="no-results-text" class="empty-text" data-i18n="no_results"></p>
-      <button type="button" id="btn-reset-filters" class="btn btn-secondary btn-sm" data-i18n="clear_filters"></button>
+      <p id="no-results-text" class="empty-text">
+        {% for item in site.data.i18n %}
+          <span data-lang="{{ item[0] }}">{{ item[1].no_results }}</span>
+        {% endfor %}
+      </p>
+      <button type="button" id="btn-reset-filters" class="btn btn-secondary btn-sm">
+        {% for item in site.data.i18n %}
+          <span data-lang="{{ item[0] }}">{{ item[1].clear_filters }}</span>
+        {% endfor %}
+      </button>
     </div>
   </div>
 </section>
 
-<!-- Catalog Controller (Filtering, Search, and Staggered Animations) -->
+<!-- Unit labels for assessments counter embedded by Liquid -->
+<div id="quiz-count-units" style="display:none;">
+  {% for item in site.data.i18n %}
+    <span data-lang="{{ item[0] }}">{{ item[1].assessments_available }}</span>
+  {% endfor %}
+</div>
+
+<!-- Catalog Controller (Ultra-minimal: Filtering, Search, and Staggered Animations) -->
 <script src="{{ '/assets/js/catalog.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>

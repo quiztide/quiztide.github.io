@@ -466,7 +466,8 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   pointer-events: none;
 }
 
-.filter-chips-bar {
+.filter-chips-bar,
+.tag-chips-lang-group {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;

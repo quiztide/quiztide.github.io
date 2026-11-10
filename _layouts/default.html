@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ site.default_lang }}">
+<html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,54 +21,62 @@
 
   {% seo %}
 
-  <!-- Core Libraries: i18n & Anime.js -->
-  <script src="https://cdn.jsdelivr.net/npm/i18next@23.7.11/dist/umd/i18next.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/loc-i18next@0.1.6/dist/umd/loc-i18next.min.js"></script>
+  <!-- Liquid Dynamic Language Visibility Engine (Zero JS Runtime Overhead) -->
+  <style>
+    [data-lang] { display: none !important; }
+    {% for item in site.data.languages %}
+      html[lang="{{ item[0] }}"] [data-lang="{{ item[0] }}"] { display: revert !important; }
+      html[lang="{{ item[0] }}"] span[data-lang="{{ item[0] }}"] { display: inline !important; }
+      html[lang="{{ item[0] }}"] div[data-lang="{{ item[0] }}"] { display: block !important; }
+      html[lang="{{ item[0] }}"] input[data-lang="{{ item[0] }}"] { display: block !important; }
+      html[lang="{{ item[0] }}"] .quiz-card:not([data-quiz-langs~="{{ item[0] }}"]) { display: none !important; }
+      html[lang="{{ item[0] }}"] .tag-chips-lang-group[data-lang="{{ item[0] }}"] { display: flex !important; }
+    {% endfor %}
+  </style>
+
+  <!-- Core Lightweight Animation Library -->
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
 
-  <!-- Synchronous i18n Initialization in <head> -->
+  <!-- Synchronous Language Resolver in <head> -->
   <script>
     (function() {
-      window.DEFAULT_LANG = {{ site.default_lang | jsonify }};
-      window.LANGUAGES = {{ site.data.languages | jsonify }};
-      window.CURRENT_LANG = localStorage.getItem('quiztide_lang') || window.DEFAULT_LANG;
-      document.documentElement.lang = window.CURRENT_LANG;
-      window.isI18nReady = false;
+      var availableLangs = [{% for item in site.data.languages %}"{{ item[0] }}"{% unless forloop.last %},{% endunless %}{% endfor %}];
+      var savedLang = localStorage.getItem('quiztide_lang');
+      var browserLang = (navigator.language || navigator.userLanguage || '').split('-')[0].toLowerCase();
 
-      var resources = {};
-      {% for item in site.data.i18n %}
-        resources[{{ item[0] | jsonify }}] = { translation: {{ item[1] | jsonify }} };
-      {% endfor %}
+      var activeLang = null;
+      if (savedLang && availableLangs.indexOf(savedLang) !== -1) {
+        activeLang = savedLang;
+      } else if (browserLang && availableLangs.indexOf(browserLang) !== -1) {
+        activeLang = browserLang;
+      } else if (availableLangs.length > 0) {
+        activeLang = availableLangs[0];
+      }
 
-      if (window.i18next && window.locI18next) {
-        i18next.init({
-          lng: window.CURRENT_LANG,
-          resources: resources
-        }, function() {
-          window.localize = locI18next.init(i18next);
-          window.isI18nReady = true;
-        });
+      window.CURRENT_LANG = activeLang;
+      if (activeLang) {
+        document.documentElement.lang = activeLang;
       }
 
       window.setLanguage = function(lang) {
+        if (!lang || availableLangs.indexOf(lang) === -1) return;
         window.CURRENT_LANG = lang;
         localStorage.setItem('quiztide_lang', lang);
         document.documentElement.lang = lang;
-
-        i18next.changeLanguage(lang, function() {
-          if (window.localize) window.localize('body');
-          window.updateLangDropdown(lang);
-          window.dispatchEvent(new CustomEvent('quiztide:langchange', { detail: { lang: lang } }));
-        });
+        window.updateLangDropdown(lang);
+        window.dispatchEvent(new CustomEvent('quiztide:langchange', { detail: { lang: lang } }));
       };
 
       window.updateLangDropdown = function(lang) {
-        var l = window.LANGUAGES && window.LANGUAGES[lang];
-        if (!l) return;
         var flagImg = document.getElementById('current-flag-img');
         var langName = document.getElementById('current-lang-name');
-        if (flagImg) flagImg.src = l.flag;
-        if (langName) langName.textContent = l.name;
+        var btn = document.querySelector('.lang-option-item[data-lang-code="' + lang + '"]');
+        if (btn) {
+          var img = btn.querySelector('img');
+          var label = btn.querySelector('.lang-label');
+          if (flagImg && img) flagImg.src = img.src;
+          if (langName && label) langName.textContent = label.textContent;
+        }
         var dropdown = document.getElementById('lang-dropdown');
         if (dropdown) dropdown.removeAttribute('open');
       };
@@ -84,12 +92,9 @@
 
   {% include footer.html %}
 
-  <!-- Execute DOM localization synchronously before first paint -->
+  <!-- Execute initial synchronization before first paint -->
   <script>
     (function() {
-      if (window.localize) {
-        window.localize('body');
-      }
       if (window.updateLangDropdown && window.CURRENT_LANG) {
         window.updateLangDropdown(window.CURRENT_LANG);
       }

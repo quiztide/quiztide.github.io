@@ -3,7 +3,8 @@
 
   /* ==========================================================================
      Quiztide - Assessment Quiz Engine
-     Smooth Interactive Motion Powered by Anime.js (Zero Text Fallbacks)
+     Smooth Interactive Motion Powered by Anime.js
+     (100% Liquid UI Integration, Zero External i18n Libraries)
      ========================================================================== */
 
   var baseUrl = window.QUIZ_BASE_URL || './';
@@ -12,7 +13,13 @@
   }
 
   function getLang() {
-    return (window.i18next && i18next.language) || window.CURRENT_LANG || window.DEFAULT_LANG;
+    return document.documentElement.lang;
+  }
+
+  function getI18nToken(key) {
+    var lang = getLang();
+    var el = document.querySelector('#quiz-i18n-strings [data-lang="' + lang + '"]');
+    return el ? (el.getAttribute('data-' + key) || '') : '';
   }
 
   var currentLang = getLang();
@@ -23,7 +30,6 @@
   var isFinished = false;
 
   // DOM Elements
-  var quizBackLink = document.getElementById('quiz-back-link');
   var quizCategoryPill = document.getElementById('quiz-category-pill');
   var quizTimePill = document.getElementById('quiz-time-pill');
   var quizTitle = document.getElementById('quiz-title');
@@ -44,21 +50,16 @@
   var optionsList = document.getElementById('quiz-options-list');
 
   var resultCard = document.getElementById('quiz-result-card');
-  var resultCelebration = document.getElementById('result-celebration');
   var resultImgWrapper = document.getElementById('result-img-wrapper');
   var resultImg = document.getElementById('result-img');
   var resultBadge = document.getElementById('result-badge');
   var resultTitle = document.getElementById('result-title');
   var resultDesc = document.getElementById('result-description');
-  var traitBreakdownTitle = document.getElementById('trait-breakdown-title');
   var traitBarsContainer = document.getElementById('trait-bars-container');
 
   var btnWhatsapp = document.getElementById('btn-share-whatsapp');
-  var btnWhatsappText = document.getElementById('btn-whatsapp-text');
   var btnCopy = document.getElementById('btn-copy-link');
-  var btnCopyText = document.getElementById('btn-copy-text');
   var btnRestart = document.getElementById('btn-restart-quiz');
-  var btnRestartText = document.getElementById('btn-restart-text');
   var copyFeedback = document.getElementById('copy-feedback');
 
   function calculateEstMinutes(questionCount) {
@@ -83,26 +84,16 @@
         return data;
       })
       .catch(function(err) {
-        if (window.DEFAULT_LANG && targetLang !== window.DEFAULT_LANG) {
-          return loadLocale(window.DEFAULT_LANG).then(function(data) {
-            if (quizLangNotice && window.i18next) {
-              quizLangNotice.textContent = i18next.t('lang_not_available');
-              quizLangNotice.style.display = 'block';
-            }
-            return data;
-          });
-        }
+        quizData = null;
+        if (quizLangNotice) quizLangNotice.style.display = 'block';
+        if (questionCard) questionCard.style.display = 'none';
+        if (resultCard) resultCard.style.display = 'none';
         throw err;
       });
   }
 
   function updateHeader() {
-    if (!quizData || !window.i18next) return;
-
-    if (quizBackLink) {
-      var backSpan = quizBackLink.querySelector('span');
-      if (backSpan) backSpan.textContent = i18next.t('back_to_catalog');
-    }
+    if (!quizData) return;
 
     if (quizTitle) quizTitle.textContent = quizData.title || '';
     if (quizSubtitle) quizSubtitle.textContent = quizData.subtitle || '';
@@ -111,17 +102,10 @@
     var total = (quizData.questions && quizData.questions.length) ? quizData.questions.length : 1;
     var estMinutes = calculateEstMinutes(total);
     if (quizTimePill) quizTimePill.textContent = '~' + estMinutes + ' min';
-
-    if (btnCopyText) btnCopyText.textContent = i18next.t('copy_link');
-    if (btnWhatsappText) btnWhatsappText.textContent = i18next.t('share_whatsapp');
-    if (btnRestartText) btnRestartText.textContent = i18next.t('retake_quiz');
-    if (resultCelebration) resultCelebration.textContent = i18next.t('celebration');
-    if (traitBreakdownTitle) traitBreakdownTitle.textContent = i18next.t('trait_breakdown');
-    if (copyFeedback) copyFeedback.textContent = i18next.t('copied_success');
   }
 
   function renderQuestion(index) {
-    if (!quizData || !quizData.questions || !window.i18next) return;
+    if (!quizData || !quizData.questions) return;
     var questions = quizData.questions;
     var totalQuestions = questions.length;
     var q = questions[index];
@@ -130,11 +114,11 @@
     var currentNum = index + 1;
     var pct = Math.round((index / totalQuestions) * 100);
 
-    var stepWord = i18next.t('step_label');
-    var ofWord = i18next.t('of');
+    var stepWord = getI18nToken('step');
+    var ofWord = getI18nToken('of');
 
     if (questionEyebrow) {
-      questionEyebrow.textContent = stepWord.toUpperCase() + ' ' + (currentNum < 10 ? '0' + currentNum : currentNum);
+      questionEyebrow.textContent = (stepWord ? stepWord.toUpperCase() + ' ' : '') + (currentNum < 10 ? '0' + currentNum : currentNum);
     }
 
     if (progressText) {
@@ -248,7 +232,7 @@
   }
 
   // Keyboard shortcut listener (A, B, C, D or 1, 2, 3, 4)
-  window.addEventListener('keydown', function(e) {
+  document.addEventListener('keydown', function(e) {
     if (isFinished || !questionCard || questionCard.style.display === 'none') return;
     
     var key = e.key.toUpperCase();
@@ -274,7 +258,8 @@
     var questions = (quizData && quizData.questions) ? quizData.questions : [];
     var totalQuestions = questions.length || 1;
 
-    if (progressText) progressText.innerHTML = i18next.t('completed');
+    var completedWord = getI18nToken('completed');
+    if (progressText) progressText.innerHTML = completedWord;
     if (progressPercent) progressPercent.innerHTML = '<span class="tabular-nums">100%</span>';
     if (window.anime && progressFill) {
       anime({
@@ -428,14 +413,14 @@
   // Social Share Handlers
   if (btnWhatsapp) {
     btnWhatsapp.addEventListener('click', function() {
-      if (!quizData || !window.i18next) return;
+      if (!quizData) return;
       var results = quizData.results || {};
       var winner = results[winningKey] || Object.values(results)[0];
       if (!winner) return;
 
       var qTitle = quizData.title || '';
       var rTitle = winner.title || '';
-      var tmpl = i18next.t('share_msg');
+      var tmpl = getI18nToken('share-msg');
       var shareText = tmpl.replace('{title}', qTitle).replace('{result}', rTitle) + ' ' + window.location.href;
 
       var url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(shareText);

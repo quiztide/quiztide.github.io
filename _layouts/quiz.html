@@ -7,7 +7,9 @@ layout: default
   <div class="quiz-topbar">
     <a href="{{ '/' | relative_url }}" class="quiz-back-button" id="quiz-back-link">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-      <span data-i18n="back_to_catalog"></span>
+      {% for item in site.data.i18n %}
+        <span data-lang="{{ item[0] }}">{{ item[1].back_to_catalog }}</span>
+      {% endfor %}
     </a>
     <div class="quiz-pill-badges">
       <span class="quiz-tag-pill" id="quiz-category-pill"></span>
@@ -20,7 +22,11 @@ layout: default
     <h1 class="quiz-main-title" id="quiz-title"></h1>
     <p class="quiz-main-subtitle" id="quiz-subtitle"></p>
 
-    <div id="quiz-lang-notice" class="quiz-notice-box" style="display: none;" role="alert"></div>
+    <div id="quiz-lang-notice" class="quiz-notice-box" style="display: none;" role="alert">
+      {% for item in site.data.i18n %}
+        <span data-lang="{{ item[0] }}">{{ item[1].lang_not_available }}</span>
+      {% endfor %}
+    </div>
   </header>
 
   <!-- Interactive Stage -->
@@ -65,7 +71,9 @@ layout: default
     <div id="quiz-result-card" class="result-card-surface" style="display: none;" role="region" aria-live="polite">
       <div class="result-celebration-pill">
         <span class="celebration-dot"></span>
-        <span id="result-celebration" data-i18n="celebration"></span>
+        {% for item in site.data.i18n %}
+          <span data-lang="{{ item[0] }}">{{ item[1].celebration }}</span>
+        {% endfor %}
       </div>
 
       <div id="result-img-wrapper" class="result-media-box" style="display: none;">
@@ -78,7 +86,11 @@ layout: default
 
       <!-- Trait Breakdown Section -->
       <div class="trait-breakdown-card">
-        <h3 class="breakdown-card-heading" id="trait-breakdown-title" data-i18n="trait_breakdown"></h3>
+        <h3 class="breakdown-card-heading">
+          {% for item in site.data.i18n %}
+            <span data-lang="{{ item[0] }}">{{ item[1].trait_breakdown }}</span>
+          {% endfor %}
+        </h3>
         <div id="trait-bars-container" class="breakdown-bars-stack"></div>
       </div>
 
@@ -86,26 +98,48 @@ layout: default
       <div class="result-cta-panel">
         <button id="btn-share-whatsapp" class="btn btn-whatsapp" type="button">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.301-.15-1.78-.879-2.056-.98-.276-.1-.477-.15-.678.15-.201.3-.777.98-.953 1.181-.176.2-.352.226-.653.075s-1.272-.469-2.423-1.496c-.896-.799-1.501-1.785-1.677-2.086-.176-.301-.019-.464.132-.614.135-.135.301-.352.452-.528.15-.176.201-.301.301-.502.101-.201.05-.377-.025-.528s-.678-1.634-.929-2.237c-.244-.587-.493-.507-.678-.516-.176-.009-.377-.01-.577-.01s-.528.075-.804.377c-.276.301-1.055 1.03-1.055 2.513s1.08 2.915 1.231 3.116c.15.201 2.125 3.245 5.148 4.551.719.311 1.281.497 1.719.636.723.23 1.381.197 1.901.12.579-.087 1.78-.728 2.031-1.431.251-.703.251-1.306.176-1.431-.075-.125-.276-.201-.577-.352zM12.04 2c-5.523 0-10 4.477-10 10 0 1.769.46 3.486 1.334 5.006l-1.374 5.016 5.143-1.349c1.472.802 3.136 1.232 4.897 1.232 5.523 0 10-4.477 10-10s-4.477-10-10-10z"/></svg>
-          <span id="btn-whatsapp-text" data-i18n="share_whatsapp"></span>
+          {% for item in site.data.i18n %}
+            <span data-lang="{{ item[0] }}">{{ item[1].share_whatsapp }}</span>
+          {% endfor %}
         </button>
 
         <button id="btn-copy-link" class="btn btn-secondary" type="button">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-          <span id="btn-copy-text" data-i18n="copy_link"></span>
+          {% for item in site.data.i18n %}
+            <span data-lang="{{ item[0] }}">{{ item[1].copy_link }}</span>
+          {% endfor %}
         </button>
 
         <button id="btn-restart-quiz" class="btn btn-ghost" type="button">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-          <span id="btn-restart-text" data-i18n="retake_quiz"></span>
+          {% for item in site.data.i18n %}
+            <span data-lang="{{ item[0] }}">{{ item[1].retake_quiz }}</span>
+          {% endfor %}
         </button>
       </div>
 
-      <div id="copy-feedback" class="copy-toast" style="display: none;" role="status" data-i18n="copied_success"></div>
+      <div id="copy-feedback" class="copy-toast" style="display: none;" role="status">
+        {% for item in site.data.i18n %}
+          <span data-lang="{{ item[0] }}">{{ item[1].copied_success }}</span>
+        {% endfor %}
+      </div>
     </div>
   </div>
 </article>
 
+<!-- Quiz i18n Tokens Embedded by Liquid -->
+<div id="quiz-i18n-strings" style="display:none;">
+  {% for item in site.data.i18n %}
+    <div data-lang="{{ item[0] }}"
+         data-step="{{ item[1].step_label }}"
+         data-of="{{ item[1].of }}"
+         data-completed="{{ item[1].completed }}"
+         data-share-msg="{{ item[1].share_msg }}"
+         data-not-available="{{ item[1].lang_not_available }}"></div>
+  {% endfor %}
+</div>
+
 <script>
   window.QUIZ_BASE_URL = {{ page.url | relative_url | jsonify }};
 </script>
-<script src="{{ '/assets/js/quiz-engine.js' | relative_url }}?v=8.0.{{ site.time | date: '%s' }}"></script>
+<script src="{{ '/assets/js/quiz-engine.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>

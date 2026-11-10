@@ -12,15 +12,22 @@
 
     <div class="nav-actions">
       <nav class="nav-links" aria-label="Main navigation">
-        <a href="{{ '/' | relative_url }}" class="nav-item" data-i18n="nav_home"></a>
-        <a href="{{ '/about/' | relative_url }}" class="nav-item" data-i18n="nav_about"></a>
+        <a href="{{ '/' | relative_url }}" class="nav-item">
+          {% for item in site.data.i18n %}
+            <span data-lang="{{ item[0] }}">{{ item[1].nav_home }}</span>
+          {% endfor %}
+        </a>
+        <a href="{{ '/about/' | relative_url }}" class="nav-item">
+          {% for item in site.data.i18n %}
+            <span data-lang="{{ item[0] }}">{{ item[1].nav_about }}</span>
+          {% endfor %}
+        </a>
       </nav>
 
       <!-- Language Select Dropdown with Real Vector Flags -->
       <details class="lang-dropdown" id="lang-dropdown">
-        <summary class="lang-dropdown-trigger" data-i18n="[aria-label]select_language">
-          {% assign default_lang_meta = site.data.languages[site.default_lang] %}
-          <img src="{{ default_lang_meta.flag | relative_url }}" alt="" class="current-flag-img" id="current-flag-img" width="20" height="15">
+        <summary class="lang-dropdown-trigger" aria-label="Select language">
+          <img src="" alt="" class="current-flag-img" id="current-flag-img" width="20" height="15">
           <span class="current-lang-name" id="current-lang-name"></span>
           <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <polyline points="6 9 12 15 18 9"></polyline>
@@ -29,8 +36,9 @@
 
         <div class="lang-dropdown-menu" role="menu">
           {% for item in site.data.languages %}
+            {% assign lang_code = item[0] %}
             {% assign l = item[1] %}
-            <button type="button" class="lang-option-item" onclick="window.setLanguage('{{ item[0] }}')" role="menuitem">
+            <button type="button" class="lang-option-item" data-lang-code="{{ lang_code }}" onclick="window.setLanguage('{{ lang_code }}')" role="menuitem">
               <img src="{{ l.flag | relative_url }}" alt="" width="20" height="15" class="menu-flag-img">
               <span class="lang-label">{{ l.name }}</span>
             </button>
