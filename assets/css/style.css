@@ -40,14 +40,7 @@
   /* Elevation */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
-  --shadow-card-hover: 0 10px 28px -4px rgba(0, 0, 0, 0.08), 0 3px 8px -1px rgba(0, 0, 0, 0.03);
-
-  /* Fluid Motion Tokens */
-  --ease-out-fluid: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out-fluid: cubic-bezier(0.65, 0, 0.35, 1);
-  --duration-fast: 160ms;
-  --duration-normal: 240ms;
-  --duration-smooth: 360ms;
+  --shadow-card-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
 }
 
 /* ==========================================================================
@@ -175,7 +168,7 @@ input:focus:not(:focus-visible) {
   font-size: 13.5px;
   font-weight: 500;
   color: var(--text-secondary);
-  transition: color var(--duration-fast) var(--ease-out-fluid);
+  transition: color 120ms ease;
 }
 
 .nav-item:hover {
@@ -210,21 +203,13 @@ summary.lang-dropdown-trigger::-webkit-details-marker {
   font-weight: 500;
   color: var(--text-primary);
   box-shadow: var(--shadow-sm);
-  transition: background-color var(--duration-fast) var(--ease-out-fluid),
-              border-color var(--duration-fast) var(--ease-out-fluid),
-              box-shadow var(--duration-fast) var(--ease-out-fluid),
-              transform var(--duration-fast) var(--ease-out-fluid);
+  transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
   user-select: none;
 }
 
 .lang-dropdown-trigger:hover {
   border-color: var(--border-hover);
   background: #f8fafc;
-  transform: translateY(-1px);
-}
-
-.lang-dropdown-trigger:active {
-  transform: translateY(0) scale(0.98);
 }
 
 .current-flag-img,
@@ -246,23 +231,12 @@ summary.lang-dropdown-trigger::-webkit-details-marker {
 
 .dropdown-chevron {
   color: var(--text-muted);
-  transition: transform var(--duration-normal) var(--ease-out-fluid);
+  transition: transform 150ms ease;
 }
 
 .lang-dropdown.is-open .dropdown-chevron,
 details.lang-dropdown[open] .dropdown-chevron {
   transform: rotate(180deg);
-}
-
-@keyframes dropdownMenuReveal {
-  from {
-    opacity: 0;
-    transform: translateY(-4px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }
 
 .lang-dropdown-menu {
@@ -279,13 +253,11 @@ details.lang-dropdown[open] .dropdown-chevron {
   flex-direction: column;
   gap: 2px;
   z-index: 100;
-  transform-origin: top right;
 }
 
 .lang-dropdown.is-open .lang-dropdown-menu,
 details.lang-dropdown[open] .lang-dropdown-menu {
   display: flex;
-  animation: dropdownMenuReveal var(--duration-fast) var(--ease-out-fluid) forwards;
 }
 
 .lang-option-item {
@@ -355,22 +327,10 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   padding: 56px 24px 36px;
 }
 
-@keyframes heroFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .hero-container {
   max-width: 780px;
   margin: 0 auto;
   text-align: center;
-  animation: heroFadeIn var(--duration-smooth) var(--ease-out-fluid) both;
 }
 
 .hero-badge {
@@ -454,8 +414,7 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   font-size: 14px;
   color: var(--text-primary);
   box-shadow: var(--shadow-sm);
-  transition: border-color var(--duration-fast) var(--ease-out-fluid),
-              box-shadow var(--duration-fast) var(--ease-out-fluid);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
 }
 
 .search-input:focus {
@@ -497,21 +456,13 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   border-radius: var(--radius-full);
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-  transition: background-color var(--duration-fast) var(--ease-out-fluid),
-              border-color var(--duration-fast) var(--ease-out-fluid),
-              color var(--duration-fast) var(--ease-out-fluid),
-              transform var(--duration-fast) var(--ease-out-fluid);
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
   user-select: none;
 }
 
 .chip-btn:hover {
   border-color: var(--border-hover);
   color: var(--text-primary);
-  transform: translateY(-1px);
-}
-
-.chip-btn:active {
-  transform: translateY(0) scale(0.96);
 }
 
 .chip-btn.active {
@@ -559,17 +510,6 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   }
 }
 
-@keyframes cardReveal {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* Individual Quiz Card */
 .quiz-card {
   background: var(--bg-surface);
@@ -577,24 +517,14 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-card);
-  transition: transform var(--duration-normal) var(--ease-out-fluid),
-              border-color var(--duration-normal) var(--ease-out-fluid),
-              box-shadow var(--duration-normal) var(--ease-out-fluid);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
   display: flex;
   flex-direction: column;
-  animation: cardReveal 300ms var(--ease-out-fluid) both;
-  animation-delay: calc(var(--card-index, 0) * 35ms);
-  will-change: transform, box-shadow;
 }
 
 .quiz-card:hover {
-  transform: translateY(-3px);
   border-color: var(--border-hover);
   box-shadow: var(--shadow-card-hover);
-}
-
-.quiz-card:active {
-  transform: translateY(-1px);
 }
 
 .quiz-card-link {
@@ -618,12 +548,6 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform var(--duration-smooth) var(--ease-out-fluid);
-  will-change: transform;
-}
-
-.quiz-card:hover .card-cover-img {
-  transform: scale(1.035);
 }
 
 .card-tag-badge {
@@ -700,11 +624,6 @@ details.lang-dropdown[open] .lang-dropdown-menu {
 
 .card-cta-arrow {
   color: var(--text-primary);
-  transition: transform var(--duration-fast) var(--ease-out-fluid);
-}
-
-.quiz-card:hover .card-cta-arrow {
-  transform: translateX(3px);
 }
 
 /* ==========================================================================
@@ -736,15 +655,12 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   color: var(--text-secondary);
   text-decoration: none;
   box-shadow: var(--shadow-sm);
-  transition: color var(--duration-fast) var(--ease-out-fluid),
-              border-color var(--duration-fast) var(--ease-out-fluid),
-              transform var(--duration-fast) var(--ease-out-fluid);
+  transition: color 120ms ease, border-color 120ms ease;
 }
 
 .quiz-back-button:hover {
   color: var(--text-primary);
   border-color: var(--border-hover);
-  transform: translateX(-2px);
 }
 
 .quiz-pill-badges {
@@ -823,18 +739,7 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   height: 100%;
   background: var(--border-dark);
   border-radius: var(--radius-full);
-  transition: width var(--duration-smooth) var(--ease-out-fluid);
-}
-
-@keyframes questionEntrance {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  transition: width 200ms ease;
 }
 
 /* Question Active Card Surface */
@@ -844,18 +749,6 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   border-radius: var(--radius-xl);
   padding: 32px 28px;
   box-shadow: var(--shadow-card);
-  transition: opacity var(--duration-fast) var(--ease-out-fluid),
-              transform var(--duration-fast) var(--ease-out-fluid);
-  animation: questionEntrance var(--duration-normal) var(--ease-out-fluid) both;
-}
-
-.question-card-surface.is-transitioning {
-  opacity: 0;
-  transform: translateY(-6px);
-}
-
-.question-card-surface.is-entering {
-  animation: questionEntrance var(--duration-normal) var(--ease-out-fluid) both;
 }
 
 .question-media-wrapper {
@@ -933,29 +826,26 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   color: var(--text-primary);
   cursor: pointer;
   text-align: left;
-  transition: background-color var(--duration-fast) var(--ease-out-fluid),
-              border-color var(--duration-fast) var(--ease-out-fluid),
-              transform var(--duration-fast) var(--ease-out-fluid),
-              box-shadow var(--duration-fast) var(--ease-out-fluid);
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
   box-shadow: var(--shadow-sm);
 }
 
 .quiz-option-button:hover:not(.disabled) {
   background: #f8fafc;
   border-color: var(--border-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.quiz-option-button:active:not(.disabled) {
-  transform: translateY(0) scale(0.99);
 }
 
 .quiz-option-button.selected {
-  background: var(--bg-muted);
+  background: var(--border-dark);
   border-color: var(--border-dark);
+  color: var(--text-inverse);
   font-weight: 500;
-  transform: translateY(0) scale(0.995);
+}
+
+.quiz-option-button.selected .option-key-badge {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--text-inverse);
 }
 
 .quiz-option-button.disabled {
@@ -993,7 +883,6 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   border-radius: var(--radius-xl);
   padding: 36px 32px;
   box-shadow: var(--shadow-card);
-  animation: questionEntrance var(--duration-smooth) var(--ease-out-fluid) both;
 }
 
 .result-celebration-pill {
@@ -1106,7 +995,7 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   height: 100%;
   background: #94a3b8;
   border-radius: var(--radius-full);
-  transition: width 650ms var(--ease-out-fluid);
+  transition: width 200ms ease;
 }
 
 .bar-fill-amount.is-winner {
@@ -1147,20 +1036,8 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   border-radius: var(--radius-md);
   text-decoration: none;
   cursor: pointer;
-  transition: background-color var(--duration-fast) var(--ease-out-fluid),
-              border-color var(--duration-fast) var(--ease-out-fluid),
-              color var(--duration-fast) var(--ease-out-fluid),
-              transform var(--duration-fast) var(--ease-out-fluid),
-              box-shadow var(--duration-fast) var(--ease-out-fluid);
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
   border: 1px solid transparent;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-}
-
-.btn:active {
-  transform: translateY(0) scale(0.98);
 }
 
 .btn-whatsapp {
@@ -1347,7 +1224,7 @@ details.lang-dropdown[open] .lang-dropdown-menu {
   font-size: 13px;
   color: var(--text-secondary);
   text-decoration: none;
-  transition: color var(--duration-fast) var(--ease-out-fluid);
+  transition: color 120ms ease;
 }
 
 .footer-link:hover {

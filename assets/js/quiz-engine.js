@@ -188,29 +188,15 @@
       scores[resultType] = (scores[resultType] || 0) + 1;
     }
 
-    if (questionCard) {
-      questionCard.classList.add('is-transitioning');
-    }
-
     setTimeout(function() {
       currentIndex++;
       var questions = (quizData && quizData.questions) ? quizData.questions : [];
       if (currentIndex < questions.length) {
         renderQuestion(currentIndex);
-        if (questionCard) {
-          questionCard.classList.remove('is-transitioning');
-          questionCard.classList.add('is-entering');
-          setTimeout(function() {
-            questionCard.classList.remove('is-entering');
-          }, 260);
-        }
       } else {
-        if (questionCard) {
-          questionCard.classList.remove('is-transitioning');
-        }
         showResults();
       }
-    }, 160);
+    }, 120);
   }
 
   // Keyboard shortcut listener (A, B, C, D or 1, 2, 3, 4)
@@ -295,7 +281,6 @@
       }
       if (totalAnswered === 0) totalAnswered = totalQuestions;
 
-      var barIndex = 0;
       for (var rk in results) {
         var rItem = results[rk];
         var count = scores[rk] || 0;
@@ -308,19 +293,10 @@
           '<span class="bar-trait-value tabular-nums">' + percentage + '%</span>' +
         '</div>' +
         '<div class="bar-track-wrap">' +
-          '<div class="bar-fill-amount' + (rk === winningKey ? ' is-winner' : '') + '" style="width: 0%;"></div>' +
+          '<div class="bar-fill-amount' + (rk === winningKey ? ' is-winner' : '') + '" style="width: ' + percentage + '%;"></div>' +
         '</div>';
 
         traitBarsContainer.appendChild(barRow);
-
-        (function(row, pct, delay) {
-          setTimeout(function() {
-            var fill = row.querySelector('.bar-fill-amount');
-            if (fill) fill.style.width = pct + '%';
-          }, delay);
-        })(barRow, percentage, 80 + (barIndex * 60));
-
-        barIndex++;
       }
     }
 
